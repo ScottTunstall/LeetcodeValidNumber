@@ -18,23 +18,23 @@ namespace LeetCodeIsValidNumber
             
         }
 
-        private bool IsDecimal(string s)
+        private bool IsDecimal(in string s)
         {
             try
             {
                 var idx = 0;
                 OptionalSign(s, idx, out idx);
                 OptionalSpaces(s, idx, out idx);
-                var digitsForWholePart  = ProcessDigits(s, idx, out idx);
-                MandatoryDot(s, idx, out idx);
-                var digitsForFracPart = ProcessDigits(s, idx, out idx);
+                var digitsForWholePart  = CountContiguousDigitsFrom(s, idx, out idx);
+                AssertDecimalPoint(s, idx, out idx);
+                var digitsForFracPart = CountContiguousDigitsFrom(s, idx, out idx);
 
                 // Guard for string "." where no whole part or fract parts in number!
                 if (digitsForWholePart == 0 && digitsForFracPart == 0)
                     return false;
 
                 OptionalExponent(s, idx, out idx);
-                EndOfLine(s, idx);
+                AssertEndOfLine(s, idx);
                 return true;
             }
             catch
@@ -45,21 +45,21 @@ namespace LeetCodeIsValidNumber
 
 
 
-        private bool IsInteger(string s)
+        private bool IsInteger(in string s)
         {
             try
             {
                 var idx = 0;
                 OptionalSign(s, idx, out idx);
                 OptionalSpaces(s, idx, out idx);
-                var digitsForWholePart = ProcessDigits(s, idx, out idx);
+                var digitsForWholePart = CountContiguousDigitsFrom(s, idx, out idx);
 
                 // have we been given an integer with no digits whatsoever?
                 if (digitsForWholePart == 0)
                     return false;
 
                 OptionalExponent(s, idx, out idx);
-                EndOfLine(s, idx);
+                AssertEndOfLine(s, idx);
                 return true;
             }
             catch
@@ -69,7 +69,7 @@ namespace LeetCodeIsValidNumber
         }
 
 
-        private void OptionalSpaces(string s, int idx, out int newIdx)
+        private static void OptionalSpaces(in string s, in int idx, out int newIdx)
         {
             newIdx = idx;
 
@@ -82,7 +82,7 @@ namespace LeetCodeIsValidNumber
         }
 
 
-        private void OptionalSign(string s, int idx, out int newIdx)
+        private static void OptionalSign(in string s, in int idx, out int newIdx)
         {
             newIdx = idx;
 
@@ -93,7 +93,7 @@ namespace LeetCodeIsValidNumber
 
         
 
-        private void OptionalExponent(string s, int idx, out int newIdx)
+        private static void OptionalExponent(in string s, in int idx, out int newIdx)
         {
             newIdx = idx;
 
@@ -113,13 +113,13 @@ namespace LeetCodeIsValidNumber
             if (ch == '+' || ch == '-')
                 newIdx++;
 
-            bool haveAtLeastOneDigit = ProcessDigits(s, newIdx, out newIdx) > 0;
+            bool haveAtLeastOneDigit = CountContiguousDigitsFrom(s, newIdx, out newIdx) > 0;
 
             if (!haveAtLeastOneDigit)
                 throw new ArgumentException("At least one digit must be supplied for exponent.");
         }
 
-        private int ProcessDigits(string s, int idx, out int newIdx)
+        private static int CountContiguousDigitsFrom(in string s, in int idx, out int newIdx)
         {
             newIdx = idx;
 
@@ -143,7 +143,7 @@ namespace LeetCodeIsValidNumber
         }
 
 
-        private void MandatoryDot(string s, int idx, out int newIdx)
+        private static void AssertDecimalPoint(in string s, in int idx, out int newIdx)
         {
             newIdx = idx;
             char ch = s[idx];
@@ -153,7 +153,7 @@ namespace LeetCodeIsValidNumber
             newIdx++;
         }
 
-        private void EndOfLine(string s, int idx)
+        private static void AssertEndOfLine(in string s, in int idx)
         {
             if (idx < s.Length)
                 throw new ArgumentException($"Have not reached end of line in {s} at position {idx}");
