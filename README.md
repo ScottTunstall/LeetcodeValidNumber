@@ -1,6 +1,9 @@
 # LeetcodeValidNumber
 My solution to the Valid Number HARD problem on Leetcode.
 
+This is for study purposes ONLY. You are not allowed to submit this code or derivatives to Leetcode. Don't be a cheat!
+
+
 ## Iteration 1 (the one currently committed):
 
 Runtime: 104 ms, faster than 39.27% of C# online submissions for Valid Number.
