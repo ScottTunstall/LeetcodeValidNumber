@@ -1,7 +1,7 @@
 # LeetcodeValidNumber
 My solution to the Valid Number HARD problem on Leetcode.
 
-This is for study purposes ONLY. You are not allowed to submit this code or derivatives to Leetcode. Don't be a cheat!
+This is for study purposes ONLY. You are not allowed to submit this code or derivatives to Leetcode/HackerRank/job interviews etc. Don't be a cheat!
 
 
 ## Iteration 1 
