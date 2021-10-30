@@ -27,7 +27,6 @@ Had an idea - it could be the exceptions being thrown? They do like to eat RAM.
 Yes, the exceptions were chewing up RAM and processor time. So I stopped throwing them. Check out the improvements!
 
 
-Details 
 
 Runtime: 76 ms, faster than 91.04% of C# online submissions for Valid Number.
 
