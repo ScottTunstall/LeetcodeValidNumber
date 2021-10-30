@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LeetCodeIsValidNumber
 {
@@ -13,65 +8,65 @@ namespace LeetCodeIsValidNumber
         {
             if (string.IsNullOrEmpty(s))
                 return false;
-            
+
             return (IsDecimal(s) || IsInteger(s));
-            
+
         }
 
-        private bool IsDecimal(in string s)
+        private static bool IsDecimal(in string s)
         {
-            try
-            {
-                var idx = 0;
-                OptionalSign(s, idx, out idx);
-                OptionalSpaces(s, idx, out idx);
-                var digitsForWholePart  = CountContiguousDigitsFrom(s, idx, out idx);
-                AssertDecimalPoint(s, idx, out idx);
-                var digitsForFracPart = CountContiguousDigitsFrom(s, idx, out idx);
+            var idx = 0;
+            OptionalSign(s, idx, out idx);
+            OptionalSpaces(s, idx, out idx);
+            var digitsForWholePart = CountContiguousDigitsFrom(s, idx, out idx);
 
-                // Guard for string "." where no whole part or fract parts in number!
-                if (digitsForWholePart == 0 && digitsForFracPart == 0)
-                    return false;
-
-                OptionalExponent(s, idx, out idx);
-                AssertEndOfLine(s, idx);
-                return true;
-            }
-            catch
-            {
+            if (!IsDecimalPoint(s, idx, out idx))
                 return false;
-            }
+
+            var digitsForFracPart = CountContiguousDigitsFrom(s, idx, out idx);
+
+            // Guard for string "." where no whole part or fract parts in number!
+            if (digitsForWholePart == 0 && digitsForFracPart == 0)
+                return false;
+
+            if (IsEndOfLine(s, idx))
+                return true;
+
+            if (!IsExponent(s, idx, out idx))
+                return false;
+
+            return IsEndOfLine(s, idx);
         }
 
 
 
-        private bool IsInteger(in string s)
+        private static bool IsInteger(in string s)
         {
-            try
-            {
-                var idx = 0;
-                OptionalSign(s, idx, out idx);
-                OptionalSpaces(s, idx, out idx);
-                var digitsForWholePart = CountContiguousDigitsFrom(s, idx, out idx);
+            var idx = 0;
+            OptionalSign(s, idx, out idx);
+            OptionalSpaces(s, idx, out idx);
+            var digitsForWholePart = CountContiguousDigitsFrom(s, idx, out idx);
 
-                // have we been given an integer with no digits whatsoever?
-                if (digitsForWholePart == 0)
-                    return false;
-
-                OptionalExponent(s, idx, out idx);
-                AssertEndOfLine(s, idx);
-                return true;
-            }
-            catch
-            {
+            // have we been given an integer with no digits whatsoever?
+            if (digitsForWholePart == 0)
                 return false;
-            }
+
+            if (IsEndOfLine(s, idx))
+                return true;
+
+            if (!IsExponent(s, idx, out idx))
+                return false;
+
+            return IsEndOfLine(s, idx);
         }
 
 
-        private static void OptionalSpaces(in string s, in int idx, out int newIdx)
+        private static void OptionalSpaces(in string s,  int idx, out int newIdx)
         {
             newIdx = idx;
+
+            if (IsEndOfLine(s, idx))
+                return;
 
             char ch = s[newIdx];
             while (char.IsWhiteSpace(ch) & newIdx < s.Length)
@@ -82,48 +77,53 @@ namespace LeetCodeIsValidNumber
         }
 
 
-        private static void OptionalSign(in string s, in int idx, out int newIdx)
+        private static void OptionalSign(in string s, int idx, out int newIdx)
         {
             newIdx = idx;
 
-            char ch = s[newIdx];
+            if (IsEndOfLine(s, idx))
+                return;
+
+            char ch = s[idx];
             if (ch == '-' || ch == '+')
-                newIdx ++;
+                newIdx++;
         }
 
-        
 
-        private static void OptionalExponent(in string s, in int idx, out int newIdx)
+
+        private static bool IsExponent(in string s, int idx, out int newIdx)
         {
             newIdx = idx;
 
-            if (idx>= s.Length)
-                return;
-            
-            char ch = s[newIdx];
+            if (IsEndOfLine(s,idx))
+                return false;
+
+            char ch = s[idx];
             if (ch != 'e' && ch != 'E')
-                return;
+                return false;
 
-            newIdx++;
+            idx++;
 
-            if (newIdx >= s.Length)
-                throw new ArgumentException("Expected +, - or digit");
+            if (IsEndOfLine(s,idx))
+                return false;
 
-            ch = s[newIdx];
+            ch = s[idx];
             if (ch == '+' || ch == '-')
-                newIdx++;
+                idx++;
 
-            bool haveAtLeastOneDigit = CountContiguousDigitsFrom(s, newIdx, out newIdx) > 0;
+            bool haveAtLeastOneDigit = CountContiguousDigitsFrom(s, idx, out idx) > 0;
 
-            if (!haveAtLeastOneDigit)
-                throw new ArgumentException("At least one digit must be supplied for exponent.");
+            if (haveAtLeastOneDigit)
+                newIdx = idx;
+
+            return haveAtLeastOneDigit;
         }
 
         private static int CountContiguousDigitsFrom(in string s, in int idx, out int newIdx)
         {
             newIdx = idx;
 
-            if (idx >= s.Length)
+            if (IsEndOfLine(s,idx))
                 return 0;
 
             int countOfDigits = 0;
@@ -143,22 +143,25 @@ namespace LeetCodeIsValidNumber
         }
 
 
-        private static void AssertDecimalPoint(in string s, in int idx, out int newIdx)
+        private static bool IsDecimalPoint(in string s, in int idx, out int newIdx)
         {
             newIdx = idx;
+
+            if (IsEndOfLine(s,idx))
+                return false;
+
             char ch = s[idx];
             if (ch != '.')
-                throw new ArgumentException("expected dot");
+                return false;
 
             newIdx++;
+            return true;
         }
 
-        private static void AssertEndOfLine(in string s, in int idx)
+
+        private static bool IsEndOfLine(in string s, in int idx)
         {
-            if (idx < s.Length)
-                throw new ArgumentException($"Have not reached end of line in {s} at position {idx}");
+            return (idx == s.Length);
         }
-
-
     }
 }
